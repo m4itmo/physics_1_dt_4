@@ -3,8 +3,6 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 from random import random, randint
 
-fps = 60
-
 
 def speed_to_vector(magnitude, angle_deg):
     angle_rad = np.radians(angle_deg)
@@ -15,38 +13,53 @@ def protect_int(x: float) -> int:
     return 1 if x < 0 else int(x)
 
 
-print('Select input mode:')
-print('0 - random')
-print('1 - manual')
-mode = int(input('Mode: '))
+def auto_suggested_input(text: str, suggestion: float) -> float:
+    try:
+        return float(input(text))
+    except ValueError:
+        print(f'Selected value: {suggestion}')
+        return int(suggestion)
+
+
+mode = -1
+while mode not in (0, 1):
+    print('Select input mode:')
+    print('0 - random')
+    print('1 - manual')
+    mode = int(input('Mode: '))
+    print()
 
 width = (
-    float(input('Enter the width of the container (e.g., 100): '))
+    auto_suggested_input('Enter the width of the container (e.g., 100): ', 100)
 ) if mode == 1 else randint(50, 200)
 height = (
-    float(input(f'Enter the height of the container (e.g., {protect_int(width / 2)}): '))
+    auto_suggested_input(f'Enter the height of the container (e.g., {protect_int(width / 2)}): ', width / 2)
 ) if mode == 1 else protect_int(width * random())
 
 k = (width + height) / 150
 m1 = (
-    float(input(f'Enter the mass of the first body (e.g., {protect_int(k * 2)}): '))
+    auto_suggested_input(f'Enter the mass of the first body (e.g., {protect_int(k * 2)}): ', k * 2)
 ) if mode == 1 else protect_int(k * 2)
 m2 = (
-    float(input(f'Enter the mass of the second body (e.g., {protect_int(k * 3)}): '))
+    auto_suggested_input(f'Enter the mass of the second body (e.g., {protect_int(k * 3)}): ', k * 3)
 ) if mode == 1 else protect_int(k * 3)
 
 v1_magnitude = (
-    float(input(f'Enter the speed magnitude of the first body (e.g., {protect_int(k * 15)}): '))
+    auto_suggested_input(f'Enter the speed magnitude of the first body (e.g., {protect_int(k * 15)}): ', k * 15)
 ) if mode == 1 else protect_int(k * 15)
 v1_angle = (
-    float(input(f'Enter the direction (angle in degrees) of the first body (e.g., {randint(0, 90)}): ')) % 360
-) if mode == 1 else randint(0, 90)
+    auto_suggested_input(f'Enter the direction (angle in degrees) of the first body (e.g., {randint(0, 90)}): ',
+                         randint(0, 90))
+) if mode == 1 else randint(0, 90) % 360
+
 v2_magnitude = (
-    float(input(f'Enter the speed magnitude of the second body (e.g., {protect_int(k * 20)}): '))
+    auto_suggested_input(f'Enter the speed magnitude of the second body (e.g., {protect_int(k * 20)}): ', k * 20)
 ) if mode == 1 else protect_int(k * 20)
 v2_angle = (
-    float(input(f'Enter the direction (angle in degrees) of the second body (e.g., {randint(90, 360)}): ')) % 360
-) if mode == 1 else randint(90, 360)
+    auto_suggested_input(
+        f'Enter the direction (angle in degrees) of the second body (e.g., {randint(90, 360)}): ',
+        randint(90, 360))
+) if mode == 1 else randint(90, 360) % 360
 
 v1 = speed_to_vector(v1_magnitude, v1_angle)
 v2 = speed_to_vector(v2_magnitude, v2_angle)
@@ -56,7 +69,7 @@ pos2 = np.array([width * 0.75, height * 0.5])
 
 r1 = min(width, height) / 10
 r2 = r1 * 1.5
-dt = 1 / fps
+dt = 0.01
 
 
 def update_positions():
